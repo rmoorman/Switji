@@ -14,6 +14,8 @@ public interface PersistenceWriter {
 
     public void delete(final String id);
 
+    public byte[] read(final String id);
+
     public List<byte[]> loadData();
 
     public void reset();

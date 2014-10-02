@@ -36,6 +36,7 @@ public class PersistentCallSessionMapper extends DefaultCallSessionMapper implem
     private PersistenceWriter writer;
     private boolean compressed = true;
     private List<CallPreparation> preparations = new ArrayList<CallPreparation>();
+    private boolean sharedSession = false;
 
     public PersistentCallSessionMapper() {
         super();
@@ -106,6 +107,22 @@ public class PersistentCallSessionMapper extends DefaultCallSessionMapper implem
     protected CallSession createSession(JingleIQ jingle) {
         final CallSession session = super.createSession(jingle);
         session.setSessionUpdateListener(this);
+        return session;
+    }
+
+    @Override
+    public CallSession getSession(final String id) {
+        CallSession session = super.getSession(id);
+        if (isSharedSession() && writer != null && session == null) {
+            final byte[] entry = writer.read(id);
+            try {
+                if (entry != null) {
+                    session = fromXml(isCompressed() ? unzip(entry) : new String(entry, ENCODE));
+                }
+            } catch (Exception e) {
+                log.error("Error retrieving call session", e);
+            }
+        }
         return session;
     }
 
@@ -180,7 +197,11 @@ public class PersistentCallSessionMapper extends DefaultCallSessionMapper implem
     }
 
     private String getPersistentId(final CallSession cs) {
-        return "CS:" + cs.getId();
+        return getPersistentId(cs.getId());
+    }
+
+    private String getPersistentId(final String id) {
+        return "CS:" + id;
     }
 
     public void setWriter(final PersistenceWriter writer) {
@@ -197,5 +218,13 @@ public class PersistentCallSessionMapper extends DefaultCallSessionMapper implem
 
     public void setCompressed(boolean compressed) {
         this.compressed = compressed;
+    }
+
+    public boolean isSharedSession() {
+        return sharedSession;
+    }
+
+    public void setSharedSession(boolean sharedSession) {
+        this.sharedSession = sharedSession;
     }
 }

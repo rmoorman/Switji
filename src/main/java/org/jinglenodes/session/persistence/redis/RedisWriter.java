@@ -17,10 +17,12 @@ import java.util.Set;
  */
 public class RedisWriter implements PersistenceWriter {
 
+    final private static int DEFAULT_SESSION_TTL = 3600;
     final private static Logger log = Logger.getLogger(RedisWriter.class);
     final private String ENCODE = "UTF-8";
     private String redisHost = "localhost";
     private int redisPort = 6379;
+    private int timeToLive = DEFAULT_SESSION_TTL;
 
     @Override
     public void write(String id, byte[] data) {
@@ -34,7 +36,7 @@ public class RedisWriter implements PersistenceWriter {
             try {
                 log.debug("Persisting CallSession");
                 final byte[] bkey = id.getBytes(ENCODE);
-                jedis.setex(bkey, 3600, data);
+                jedis.setex(bkey, getTimeToLive(), data);
             } catch (UnsupportedEncodingException e) {
                 log.error("Unsupported Encoding on CallSession ID", e);
             } finally {
@@ -44,6 +46,31 @@ public class RedisWriter implements PersistenceWriter {
             log.error("Could not Write: " + id, e);
         }
 
+    }
+
+    @Override
+    public byte[] read(String id) {
+        log.debug("Reading Data: " + id);
+        byte[] data = null;
+        try {
+            JedisConnection connection = JedisConnection.getInstance(redisHost, redisPort);
+            Jedis jedis = connection.getResource();
+
+            if (jedis == null) return null;
+
+            try {
+                log.debug("Reading CallSession");
+                final byte[] bkey = id.getBytes(ENCODE);
+                data = jedis.get(bkey);
+            } catch (UnsupportedEncodingException e) {
+                log.error("Unsupported Encoding on CallSession ID", e);
+            } finally {
+                connection.returnResource(jedis);
+            }
+        } catch (Exception e) {
+            log.error("Could not Write: " + id, e);
+        }
+        return data;
     }
 
     @Override
@@ -138,5 +165,13 @@ public class RedisWriter implements PersistenceWriter {
 
     public void setRedisPort(int redisPort) {
         this.redisPort = redisPort;
+    }
+
+    public int getTimeToLive() {
+        return timeToLive;
+    }
+
+    public void setTimeToLive(int timeToLive) {
+        this.timeToLive = timeToLive;
     }
 }
