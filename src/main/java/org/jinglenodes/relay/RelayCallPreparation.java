@@ -294,4 +294,12 @@ public class RelayCallPreparation extends CallPreparation implements ResultRecei
     public void setUseOnForwardedCalls(boolean useOnForwardedCalls) {
         this.useOnForwardedCalls = useOnForwardedCalls;
     }
+
+    public ConcurrentTimelineHashMap<String, CallSession> getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(ConcurrentTimelineHashMap<String, CallSession> sessions) {
+        this.sessions = sessions;
+    }
 }

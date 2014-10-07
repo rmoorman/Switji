@@ -4,3 +4,4 @@ target/
 *.iml
 *.iws
 *.DS_store
+src/test/java/org/xmpp/DelayCheck.java

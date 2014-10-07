@@ -18,6 +18,7 @@ import org.jinglenodes.sip.account.CachedSipAccountProvider;
 import org.jinglenodes.sip.processor.SipProcessor;
 import org.jinglenodes.sip.router.SipRoutingError;
 import org.jinglenodes.sip.router.SipRoutingListener;
+import org.jinglenodes.util.ZipUtil;
 import org.xmpp.packet.JID;
 import org.xmpp.tinder.JingleIQ;
 import org.zoolu.sip.message.Message;
@@ -131,8 +132,8 @@ public class TestSIPGateway extends TestCase {
         for (int i = 0; i < 100; i++) {
             try {
                 x = sessionMapper.toXml(cs);
-                ba = sessionMapper.zip(x);
-                x = sessionMapper.unzip(ba);
+                ba = ZipUtil.zip(x);
+                x = ZipUtil.unzip(ba);
             } catch (Exception e) {
                 e.printStackTrace();
             }

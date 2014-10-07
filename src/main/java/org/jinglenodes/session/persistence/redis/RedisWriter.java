@@ -5,9 +5,7 @@ import org.jinglenodes.session.persistence.PersistenceWriter;
 import redis.clients.jedis.Jedis;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +32,7 @@ public class RedisWriter implements PersistenceWriter {
             if (jedis == null) return;
 
             try {
-                log.debug("Persisting CallSession");
+                log.debug("Persisting Data");
                 final byte[] bkey = id.getBytes(ENCODE);
                 jedis.setex(bkey, getTimeToLive(), data);
             } catch (UnsupportedEncodingException e) {
@@ -59,7 +57,7 @@ public class RedisWriter implements PersistenceWriter {
             if (jedis == null) return null;
 
             try {
-                log.debug("Reading CallSession");
+                log.debug("Reading Data");
                 final byte[] bkey = id.getBytes(ENCODE);
                 data = jedis.get(bkey);
             } catch (UnsupportedEncodingException e) {
@@ -83,10 +81,10 @@ public class RedisWriter implements PersistenceWriter {
             if (jedis == null) return;
 
             try {
-                log.debug("Deleting Persistent CallSession");
+                log.debug("Deleting Persistent Data");
                 jedis.del(id.getBytes(ENCODE));
             } catch (UnsupportedEncodingException e) {
-                log.error("Unsupported Encoding on CallSession ID", e);
+                log.error("Unsupported Encoding on ID", e);
             } finally {
                 connection.returnResource(jedis);
             }
@@ -96,6 +94,7 @@ public class RedisWriter implements PersistenceWriter {
 
     }
 
+    @Override
     public List<byte[]> loadData() {
 
         final List<byte[]> data = new ArrayList<byte[]>();
@@ -110,14 +109,51 @@ public class RedisWriter implements PersistenceWriter {
 
             final Set<String> keys = jedis.keys("*");
 
-            log.debug("Loading Persistent CallSession...");
+            log.debug("Loading Persistent Data...");
             for (final String key : keys) {
                 try {
                     log.debug("Loaded Key: " + key);
                     final byte[] b = jedis.get(key.getBytes(ENCODE));
                     data.add(b);
                 } catch (UnsupportedEncodingException e) {
-                    log.error("Unsupported Encoding on CallSession ID", e);
+                    log.error("Unsupported Encoding on ID", e);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Could not Load Data", e);
+        } finally {
+            if (connection != null && jedis != null) {
+                connection.returnResource(jedis);
+            }
+        }
+
+        return data;
+    }
+
+    @Override
+    public Map<String, byte[]> loadDataWithKeys() {
+
+        final Map<String, byte[]> data = new HashMap<String, byte[]>();
+        JedisConnection connection = null;
+        Jedis jedis = null;
+
+        try {
+            connection = JedisConnection.getInstance(redisHost, redisPort);
+            jedis = connection.getResource();
+
+            if (jedis == null) return data;
+
+            final Set<String> keys = jedis.keys("*");
+
+            log.debug("Loading Persistent Data...");
+            for (final String key : keys) {
+                try {
+                    log.debug("Loaded Key: " + key);
+                    final byte[] b = jedis.get(key.getBytes(ENCODE));
+                    data.put(key, b);
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Unsupported Encoding on ID", e);
                 }
             }
 
@@ -141,7 +177,7 @@ public class RedisWriter implements PersistenceWriter {
             if (jedis == null) return;
 
             try {
-                log.debug("Deleting All Persistent CallSessions");
+                log.debug("Deleting All Persistent Data");
                 jedis.flushAll();
             } finally {
                 connection.returnResource(jedis);

@@ -10,7 +10,7 @@ public class PersistenceTask implements Runnable {
 
     final private String id;
     final PersistenceWriter writer;
-    private byte[] data;
+    final private byte[] data;
 
     public PersistenceTask(final String id, final byte[] data, final PersistenceWriter writer) {
         this.id = id;
@@ -20,6 +20,7 @@ public class PersistenceTask implements Runnable {
 
     public PersistenceTask(final String id, final PersistenceWriter writer) {
         this.id = id;
+        this.data = null;
         this.writer = writer;
     }
 

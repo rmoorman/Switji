@@ -10,7 +10,7 @@ import java.util.concurrent.*;
  */
 public class PersistenceWriterQueue {
 
-    private final BlockingQueue<Runnable> linkedBlockingDeque = new LinkedBlockingDeque<Runnable>(50);
+    private final BlockingQueue<Runnable> linkedBlockingDeque = new LinkedBlockingDeque<Runnable>(100);
     private final ExecutorService executorService = new ThreadPoolExecutor(1, 1, 15, TimeUnit.SECONDS, linkedBlockingDeque, new ThreadPoolExecutor.CallerRunsPolicy());
     final private PersistenceWriter writer;
 

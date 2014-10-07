@@ -34,6 +34,8 @@ import org.xmpp.tinder.JingleIQ;
 import org.zoolu.sip.message.JIDFactory;
 import org.zoolu.tools.ConcurrentTimelineHashMap;
 
+import java.util.Map;
+
 /**
  * Created by IntelliJ IDEA.
  * User: thiago
@@ -44,8 +46,8 @@ import org.zoolu.tools.ConcurrentTimelineHashMap;
 public class CachedSipToJingleBind implements SipToJingleBind {
 
     private static final Logger log = Logger.getLogger(CachedSipToJingleBind.class);
-    private final ConcurrentTimelineHashMap<String, JID> sipToXmpp;
-    private final ConcurrentTimelineHashMap<String, JID> xmppToSip;
+    private Map<String, JID> sipToXmpp;
+    private Map<String, JID> xmppToSip;
 
     private JID defaultJID;
     private String defaultResource;
@@ -64,8 +66,8 @@ public class CachedSipToJingleBind implements SipToJingleBind {
         sipToXmpp = new ConcurrentTimelineHashMap<String, JID>(maxEntries, timeToLive, purgeDelay);
         xmppToSip = new ConcurrentTimelineHashMap<String, JID>(maxEntries, timeToLive, purgeDelay);
         format = new PrefixNodeFormat(); //default
-        sipToXmpp.enableScheduledPurge();
-        xmppToSip.enableScheduledPurge();
+        ((ConcurrentTimelineHashMap)sipToXmpp).enableScheduledPurge();
+        ((ConcurrentTimelineHashMap)xmppToSip).enableScheduledPurge();
     }
 
 
@@ -105,7 +107,8 @@ public class CachedSipToJingleBind implements SipToJingleBind {
         if (accountProvider != null) {
             final SipAccount account = accountProvider.getSipAccount(JIDFactory.getInstance().getJID(fromBare));
             if (account != null) {
-                final JID accountJid = JIDFactory.getInstance().getJID(account.getSipUsername() + "@" + account.getServer() + "/" + defaultResource);
+                final JID accountJid = JIDFactory.getInstance().getJID(account.getSipUsername() +
+                        "@" + account.getServer() + "/" + defaultResource);
                 xmppToSip.put(xmppInitiator.toBareJID(), accountJid);
                 return accountJid;
             }
@@ -144,5 +147,21 @@ public class CachedSipToJingleBind implements SipToJingleBind {
 
     public void setFormat(NodeFormat format) {
         this.format = format;
+    }
+
+    public Map<String, JID> getSipToXmpp() {
+        return sipToXmpp;
+    }
+
+    public void setSipToXmpp(Map<String, JID> sipToXmpp) {
+        this.sipToXmpp = sipToXmpp;
+    }
+
+    public Map<String, JID> getXmppToSip() {
+        return xmppToSip;
+    }
+
+    public void setXmppToSip(Map<String, JID> xmppToSip) {
+        this.xmppToSip = xmppToSip;
     }
 }

@@ -1,6 +1,7 @@
 package org.jinglenodes.session.persistence;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,6 +19,11 @@ public interface PersistenceWriter {
 
     public List<byte[]> loadData();
 
+    public Map<String, byte[]> loadDataWithKeys();
+
     public void reset();
 
+    public int getTimeToLive();
+
+    public void setTimeToLive(int timeToLive);
 }
