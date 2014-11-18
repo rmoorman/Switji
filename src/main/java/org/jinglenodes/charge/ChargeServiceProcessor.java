@@ -69,7 +69,6 @@ public class ChargeServiceProcessor extends AbstractServiceProcessor {
                 final OnlineChargeSession credit = session.getOnlineChargeSession();
                 if (credit != null && !credit.isCharged()) {
                     toNode = nodeFormat.formatNode(toNode, fromNode);
-                    fromNode = nodeFormat.formatNode(fromNode, null);
                     final JID to = JIDFactory.getInstance().getJID(null, chargeService, null);
                     final JID from = JIDFactory.getInstance().getJID(fromNode, this.getComponentJID().getDomain(), null);
                     final IQ request = new IQ(IQ.Type.set);
