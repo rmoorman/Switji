@@ -4,3 +4,5 @@ target/
 *.iml
 *.iws
 *.DS_store
+src/deb/control/control
+src/deb/control/postinst

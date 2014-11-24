@@ -1,0 +1,10 @@
+Package: Sipgateway-${project.version}
+Version: ${project.version}
+Section: base
+Priority: optional
+Maintainer: Upptalk
+Architecture: amd64
+Description: Upptalk's Sipgateway
+ Culo de mono
+ Ojete moreno
+ ${hola}
