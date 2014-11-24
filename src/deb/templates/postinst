@@ -1,0 +1,36 @@
+#! /bin/sh
+
+SIPGATEWAY_HOME=/opt/sipgateway
+
+set -e
+
+. /usr/share/debconf/confmodule
+db_version 2.0
+
+if [ "x$1" = xconfigure ]; then
+	if ! getent group sipgateway >/dev/null ; then
+		 deluser --quiet --system sipgateway
+	fi
+	adduser --quiet --system --group --no-create-home --home $SIPGATEWAY_HOME sipgateway
+	chown -R sipgateway:sipgateway $SIPGATEWAY_HOME
+	chown -R sipgateway:sipgateway /var/log/sipgateway
+	[ -L $SIPGATEWAY_HOME/sipgateway.jar ] && rm -f $SIPGATEWAY_HOME/sipgateway.jar
+	[ -L $SIPGATEWAY_HOME/conf ] && rm -f $SIPGATEWAY_HOME/conf
+	[ -L $SIPGATEWAY_HOME/bin ] && rm -f $SIPGATEWAY_HOME/bin
+	[ ! -L $SIPGATEWAY_HOME/sipgateway.jar ] && echo "Creating 'sipgateway.jar' symlink for Sipgateway-${project.version} in ${SIPGATEWAY_HOME}" && \
+	  ln -s $SIPGATEWAY_HOME/${project.version}/sipgateway.jar $SIPGATEWAY_HOME/sipgateway.jar
+	[ ! -L $SIPGATEWAY_HOME/conf ] && echo "Creating 'conf' symlink for Sipgateway-${project.version} in ${SIPGATEWAY_HOME}" && \
+	  ln -s $SIPGATEWAY_HOME/${project.version}/conf $SIPGATEWAY_HOME/conf
+	[ ! -L $SIPGATEWAY_HOME/bin ] && echo "Creating 'bin' symlink for Sipgateway-${project.version} in ${SIPGATEWAY_HOME}" &&
+	  ln -s $SIPGATEWAY_HOME/${project.version}/bin $SIPGATEWAY_HOME/bin
+fi
+
+# Automatically added by dh_installinit
+#if [ -x "/etc/init.d/sipgateway" ]; then
+#	update-rc.d sipgateway defaults >/dev/null
+#	invoke-rc.d sipgateway start || exit $?
+#fi
+# End automatically added section
+
+
+exit 0

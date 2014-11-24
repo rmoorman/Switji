@@ -5,3 +5,5 @@ target/
 *.iws
 *.DS_store
 src/test/java/org/xmpp/DelayCheck.java
+src/deb/control/control
+src/deb/control/postinst
