@@ -3,6 +3,7 @@ Version: ${project.version}
 Section: base
 Priority: optional
 Maintainer: Upptalk
+Depends: base-files
 Architecture: all
 Description: Sipgateway component
  Sipgateway component
